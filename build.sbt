@@ -30,6 +30,7 @@ lazy val root = (project in file("."))
     Compile / unmanagedJars += Attributed.blank(z3JarFile),
     Compile / compile := ((Compile / compile) dependsOn checksumTask).value,
     Test / test := ((Test / test) dependsOn (Compile / Keys.`package`)).value,
+    Test / testOnly := ((Test / testOnly) dependsOn (Compile / Keys.`package`)).evaluated,
     Test / internalDependencyClasspath := testClasspath.value,
     Compile / packageBin / mappings := newMappingsTask.value,
   )
