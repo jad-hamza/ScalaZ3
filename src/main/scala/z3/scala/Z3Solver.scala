@@ -43,7 +43,9 @@ class Z3Solver private[z3](val ptr: Long, val context: Z3Context) extends Z3Obje
 
   def getModel() : Z3Model = {
     if (isModelAvailable) {
-      new Z3Model(Native.solverGetModel(context.ptr, this.ptr), context)
+      val res = new Z3Model(Native.solverGetModel(context.ptr, this.ptr), context)
+      println("GETTING SOLVER GET MODEL", res)
+      res
     } else {
       throw new Exception("Cannot get model if check failed")
     }
@@ -93,7 +95,9 @@ class Z3Solver private[z3](val ptr: Long, val context: Z3Context) extends Z3Obje
 
   // Utility functions that should no longer be exposed
   private[z3] def checkAndGetModel() = {
-    (check(), if (isModelAvailable) getModel() else null)
+    val b = check()
+    println("available", isModelAvailable)
+    (b, if (isModelAvailable) getModel() else null)
   }
 
   private[z3] def checkAssumptionsGetModelOrCore(assumptions: Z3AST*) = {

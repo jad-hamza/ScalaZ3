@@ -5,6 +5,7 @@ import com.microsoft.z3.Native
 object Z3Model {
   implicit def ast2int(model: Z3Model, ast: Z3AST): Option[Int] = {
     val res = model.eval(ast)
+    println("ast2int", ast, res)
     if (res.isEmpty)
       None
     else
@@ -46,6 +47,8 @@ sealed class Z3Model private[z3](val ptr: Long, val context: Z3Context) extends 
     val out = new Native.LongPtr()
     val result = Native.modelEval(context.ptr, this.ptr, ast.ptr, completion, out)
     if (result && out.value != 0L) {
+      println("MODEL EVAL", new Z3AST(out.value, context))
+      println("CONTEXT", context)
       Some(new Z3AST(out.value, context))
     } else {
       None

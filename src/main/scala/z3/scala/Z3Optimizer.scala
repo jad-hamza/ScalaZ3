@@ -74,7 +74,9 @@ class Z3Optimizer private[z3](val ptr: Long, val context: Z3Context) extends Z3O
 
   def getModel(): Z3Model = {
     if (lastResult == Some(true)) {
-      new Z3Model(Native.optimizeGetModel(context.ptr, this.ptr), context)
+      val res = new Z3Model(Native.optimizeGetModel(context.ptr, this.ptr), context)
+      println("GETTING MODEL", res)
+      res
     } else {
       throw new Exception("Cannot get model if check failed")
     }

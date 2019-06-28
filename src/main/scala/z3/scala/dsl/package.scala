@@ -122,8 +122,11 @@ package object dsl {
   implicit object IntValHandler extends ValHandler[Int] {
     def mkSort(z3 : Z3Context) : Z3Sort = z3.mkIntSort
 
-    def convert(model : Z3Model, ast : Z3AST) : Int =
+    def convert(model : Z3Model, ast : Z3AST) : Int = {
+      println("Converting AST", ast)
+      println("model", model.evalAs[Int](ast))
       model.evalAs[Int](ast).getOrElse(0)
+    }
 
     override type ValSort = IntSort
   }
@@ -217,6 +220,7 @@ package object dsl {
   }
 
   def find[T1:ValHandler,T2:ValHandler](predicate : (Val[T1],Val[T2]) => Tree[BoolSort]) : Option[(T1,T2)] = {
+    // println("predicate", predicate)
     val z3 = new Z3Context("MODEL" -> true)
     val solver = z3.mkSolver
     val vh1 = implicitly[ValHandler[T1]]
@@ -226,11 +230,16 @@ package object dsl {
     val valAST1 = value1.tree.ast(z3)
     val valAST2 = value2.tree.ast(z3)
     val constraintTree = predicate(value1,value2)
+    println("predicate", constraintTree)
+    println("predicate2", constraintTree.ast(z3))
     solver.assertCnstr(constraintTree.ast(z3))
     solver.checkAndGetModel match {
       case (Some(true), m) => {
         val result1 = vh1.convert(m, valAST1)
         val result2 = vh2.convert(m, valAST2)
+        println("m",m)
+        println("val",valAST1)
+        println("result1",result1)
         z3.delete
         Some((result1,result2))
       }
